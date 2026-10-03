@@ -1,0 +1,38 @@
+:root {
+    --background-primary: var(--bg-pri);
+    --background-primary-hover: var(--bg-pri-hover);
+    --background-primary-great: var(--bg-pri-great);
+    --background-primary-great-hover: var(--bg-pri-great-hover);
+
+    --background-secondary: var(--bg-sec);
+    --background-secondary-hover: var(--bg-sec-hover);
+    --background-secondary-great: var(--bg-sec-great);
+    --background-secondary-great-hover: var(--bg-sec-great-hover);
+
+    --accent-color: var(--ac-text);
+    --accent-hover: var(--ac-text-hover);
+    --accent-background: var(--ac-bg);
+    --accent-background-hover: var(--ac-bg-hover);
+
+    --text-primary: var(--text-pri);
+    --text-secondary: var(--text-sec);
+
+    --border-color: var(--bc);
+
+
+    --ac-text: var(--accent);
+    --ac-text-hover: var(--accent-hover);
+    --ac-bg: var(--accent);
+    --ac-bg-hover: var(--accent-hover);
+    --ac-bg-light: var(--accent-active);
+    --ac-bg-great: var(--accent);
+    --ac-bg-great-hover: var(--accent-hover);
+    --ac-bg-great-light: var(--accent-active);
+
+    --bg-pri-great: var(--c-gray-900);
+    --bg-pri-great-hover: var(--c-gray-800);
+    --bg-sec-great: var(--c-gray-700);
+    --bg-sec-great-hover: var(--c-gray-600);
+
+    --tr: var(--transitions)
+}

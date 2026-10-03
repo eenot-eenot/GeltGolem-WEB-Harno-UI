@@ -1,0 +1,13 @@
+#langsModules {
+    width: 100%;
+    height: max-content;
+    overflow-x: hidden;
+
+    .langModule {
+        display: none;
+
+        &.active {
+            display: unset;
+        }
+    }
+}

@@ -1,0 +1,12 @@
+import './js/elements/dropdown.js';
+import './js/fetch.js';
+import './js/notification.js';
+import './js/pages.js';
+import './js/websocket.js';
+import './js/mobile.js';
+import './js/components/modal.js';
+import './js/nav.js';
+import './js/settings.js';
+import './js/translator.js';
+import './js/themes.js'
+import './js/app.js';

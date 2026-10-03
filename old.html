@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Gelt Code</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <script src="js/firebase.js" type="module"></script>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- PROFILE SETUP SCREEN (shown on first launch if no profile saved) -->
+    <div class="onboard-screen hidden" id="profile-setup-screen"
+      style="justify-content:flex-start;padding-top:60px;overflow-y:auto;">
+
+
+    <!-- XP POPUP -->
+    <div class="xp-popup" id="xp-popup">+0 XP</div>
+
+    <!-- STREAK MODAL -->
+    <div class="streak-modal-bg" id="streak-modal-bg">
+      <div class="streak-modal">
+        <div style="font-size:60px;margin-bottom:12px;">🔥</div>
+        <div style="font-size:22px;font-weight:900;color:var(--gold);margin-bottom:8px;" id="streak-modal-title">Серия
+          продолжается!</div>
+        <div style="font-size:15px;color:var(--text-muted);margin-bottom:24px;" id="streak-modal-body">Ты учишься <span
+            id="streak-modal-days" style="color:white;font-weight:900;">3</span> дней подряд. Так держать!</div>
+        <button class="btn go" onclick="closeStreakModal()">ОТЛИЧНО! 💪</button>
+      </div>
+    </div>
+
+    <!-- RESET CONFIRM MODAL -->
+    <div class="streak-modal-bg" id="reset-modal-bg" style="z-index:200;">
+      <div class="streak-modal" style="border-color:var(--danger);max-width:340px;">
+        <div id="reset-modal-step1">
+          <div style="font-size:56px;margin-bottom:12px;">⚠️</div>
+          <div style="font-size:20px;font-weight:900;color:var(--danger);margin-bottom:8px;">Сброс прогресса</div>
+          <div style="font-size:14px;color:var(--text-muted);margin-bottom:20px;line-height:1.5;">Все уроки, XP,
+            достижения и фото аватара будут <strong style="color:white;">безвозвратно удалены</strong>. Это нельзя
+            отменить.</div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn" style="flex:1;background:var(--surface-light);color:var(--text-muted);box-shadow:none;"
+              onclick="closeResetModal()">Отмена</button>
+            <button class="btn bad" style="flex:1;" onclick="resetStep2()">Продолжить</button>
+          </div>
+        </div>
+        <div id="reset-modal-step2" style="display:none;">
+          <div style="font-size:56px;margin-bottom:12px;">❗</div>
+          <div style="font-size:20px;font-weight:900;color:var(--danger);margin-bottom:8px;">Последнее предупреждение
+          </div>
+          <div style="font-size:14px;color:var(--text-muted);margin-bottom:8px;line-height:1.5;">Введи слово <strong
+              style="color:white;font-family:monospace;">СБРОС</strong> для подтверждения:</div>
+          <input class="edit-field" id="reset-confirm-input" type="text" placeholder="СБРОС" maxlength="10"
+            style="margin-bottom:14px;text-align:center;font-size:18px;font-weight:900;letter-spacing:3px;"
+            oninput="checkResetWord()" />
+          <div style="display:flex;gap:10px;">
+            <button class="btn" style="flex:1;background:var(--surface-light);color:var(--text-muted);box-shadow:none;"
+              onclick="closeResetModal()">Отмена</button>
+            <button class="btn bad" id="reset-final-btn" style="flex:1;opacity:0.4;" disabled onclick="doReset()">🗑️
+              СТЕРЕТЬ ВСЁ</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- USERNAME CONFLICT MODAL -->
+    <div class="streak-modal-bg" id="username-conflict-modal" style="z-index:210;">
+      <div class="streak-modal" style="border-color:var(--secondary);max-width:340px;">
+        <div style="font-size:48px;margin-bottom:12px;">🔒</div>
+        <div style="font-size:18px;font-weight:900;color:var(--secondary);margin-bottom:8px;">Ник уже занят</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px;line-height:1.6;">
+          Ник <strong id="conflict-username" style="color:white;font-family:monospace;"></strong> уже зарегистрирован на
+          другом устройстве.
+        </div>
+        <div
+          style="font-size:12px;color:var(--text-muted);margin-bottom:20px;line-height:1.6;background:var(--surface-light);border-radius:12px;padding:12px;">
+          Если это твой ник — открой приложение на том устройстве, где он создавался,
+          экспортируй прогресс и импортируй его здесь.<br><br>
+          Либо просто выбери другой ник.
+        </div>
+        <button class="btn go" onclick="closeUsernameConflictModal()">ПОНЯТНО</button>
+      </div>
+    </div>
+
+    <!-- PASSWORD LOGIN MODAL (shown when username already registered) -->
+    <div class="streak-modal-bg" id="password-login-modal" style="z-index:220;">
+      <div class="streak-modal" style="border-color:var(--secondary);max-width:340px;text-align:left;">
+        <div style="font-size:44px;text-align:center;margin-bottom:10px;">🔑</div>
+        <div style="font-size:18px;font-weight:900;color:var(--secondary);margin-bottom:4px;text-align:center;">Ник уже
+          зарегистрирован</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;text-align:center;">Это
+          твой аккаунт? Введи пароль — прогресс загрузится на это устройство.</div>
+        <div class="edit-label" style="margin-bottom:6px;">Пароль для <span id="pwd-modal-username"
+            style="color:white;font-family:monospace;"></span></div>
+        <input class="edit-field" id="pwd-modal-input" type="password" placeholder="Введи пароль..." maxlength="64"
+          style="margin-bottom:6px;" autocomplete="current-password"
+          onkeydown="if(event.key==='Enter') confirmPasswordLogin()" />
+        <div id="pwd-modal-error"
+          style="font-size:12px;color:var(--danger);font-weight:800;min-height:16px;margin-bottom:12px;"></div>
+        <button class="btn go" style="margin-bottom:10px;" onclick="confirmPasswordLogin()">ВОЙТИ 🔓</button>
+        <button class="btn"
+          style="background:none;box-shadow:none;color:var(--text-muted);font-size:13px;padding:8px;width:100%;text-align:center;"
+          onclick="closePasswordLoginModal()">Создать новый аккаунт с другим ником</button>
+      </div>
+    </div>
+
+
+
+    <header class="top-bar">
+      <div class="stat-pill hearts">❤️ <span id="h-count">3</span></div>
+      <div class="stat-pill gems">⚡ <span id="g-count">0</span></div>
+      <div class="stat-pill">📘 Pascal</div>
+    </header>
+
+    <div class="toast" id="toast"></div>
+
+    <main class="content">
+      <!-- HOME -->
+      <div id="scr-home" class="screen active">
+        <div id="modules-list-view"><!-- rendered by JS --></div>
+        <div id="module-path-view" style="display:none;">
+          <div id="module-path-header" style="display:flex;align-items:center;gap:10px;padding:4px 0 16px;">
+            <button onclick="backToModules()"
+              style="background:var(--surface);border:none;color:var(--text-muted);font-size:20px;cursor:pointer;padding:6px 10px;border-radius:10px;line-height:1;">←</button>
+            <div>
+              <div id="module-path-title" style="font-size:15px;font-weight:900;color:var(--text);"></div>
+              <div id="module-path-sub" style="font-size:11px;color:var(--text-muted);font-weight:700;"></div>
+            </div>
+          </div>
+          <div class="path" id="path-container"></div>
+        </div>
+      </div>
+
+      <!-- LESSON -->
+      <div id="scr-lesson" class="screen" style="padding: 16px;">
+        <div class="lesson-head">
+          <button class="close-btn" onclick="closeLesson()">✕</button>
+          <div class="progress-track">
+            <div class="progress-fill" id="prog"></div>
+          </div>
+          <div class="hearts-lesson">❤️ <span id="h-lesson">3</span></div>
+        </div>
+        <div id="q-area"></div>
+        <div class="action" id="act-area">
+          <button class="btn go" id="act-btn" onclick="actClick()" disabled>ПРОВЕРИТЬ</button>
+        </div>
+      </div>
+
+      <!-- TROPHY TEST -->
+      <div id="scr-trophy" class="screen" style="padding:0;">
+        <div class="trophy-head" style="position:sticky;top:0;z-index:10;">
+          <button class="close-btn" onclick="closeTrophy()">✕</button>
+          <div class="trophy-head-title">🏆 ФИНАЛЬНЫЙ ТЕСТ</div>
+          <div class="trophy-progress-track">
+            <div class="trophy-progress-fill" id="trophy-prog"></div>
+          </div>
+          <div id="trophy-hearts-disp" style="color:var(--danger);font-weight:800;font-size:16px;white-space:nowrap;">
+            ❤️3</div>
+        </div>
+        <div class="trophy-content" id="trophy-area"></div>
+        <div class="action" id="trophy-act-area" style="margin-top:auto;">
+          <button class="btn trophy-btn" id="trophy-act-btn" onclick="trophyActClick()" disabled>ПРОВЕРИТЬ</button>
+        </div>
+      </div>
+
+      <!-- COMPLETION -->
+      <div id="scr-completion" class="screen">
+        <div class="completion-box">
+          <div style="font-size:60px; margin-bottom:20px;">🏆</div>
+          <h2>Модуль пройден!</h2>
+          <p>Ты успешно освоил базовый синтаксис Pascal. Голем гордится тобой!</p>
+          <p style="color:var(--gold); font-weight:700; margin-bottom: 8px;">+100 XP за завершение модуля</p>
+          <button class="btn go" style="margin-top:20px;" onclick="finishModule()">ВЕРНУТЬСЯ НА ГЛАВНУЮ</button>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div id="scr-profile" class="screen" style="padding:0; overflow:visible;">
+        <div class="prof-banner" id="prof-banner">
+          <div id="prof-banner-pattern"
+            style="position:absolute;inset:0;border-radius:0;opacity:1;pointer-events:none;"></div>
+          <div class="prof-banner-title" style="position:relative;z-index:2;">МОЙ ПРОФИЛЬ</div>
+          <div class="ava-wrap">
+            <div class="ava" id="prof-ava" onclick="onAvaTap()">
+              <canvas id="ava-upload-canvas" width="200" height="200"
+                style="width:100%;height:100%;border-radius:50%;display:block;"></canvas>
+              <div class="ava-edit-badge" id="ava-edit-badge">📷</div>
+            </div>
+            <input type="file" id="ava-file-input" accept="image/*" style="display:none;">
+          </div>
+        </div>
+
+        <div class="prof-body" style="padding: 0 20px 20px;">
+          <div class="prof-username-display">
+            <div class="disp-name" id="prof-disp-name">—</div>
+            <div class="disp-user" id="prof-disp-user">@username</div>
+            <div id="dev-role-badge" style="display:none;align-items:center;justify-content:center;gap:6px;
+            margin:6px auto 0;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:800;
+            border:1.5px solid;background:rgba(0,0,0,0.3);width:fit-content;"></div>
+          </div>
+
+          <!-- Avatar crop controls – shown after EMPEROR77 unlock -->
+          <div id="ava-crop-controls"
+            style="display:none;background:var(--surface);border-radius:14px;padding:14px;border:1px solid var(--surface-light);margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="font-size:10px;font-weight:800;color:var(--text-muted);width:52px;">МАСШТАБ</span>
+              <input type="range" id="ava-zoom" min="100" max="300" value="100" step="1" style="flex:1;"
+                oninput="drawAvaUpload()">
+              <span id="ava-zoom-val"
+                style="font-size:10px;font-weight:800;color:var(--text-muted);width:32px;">100%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="font-size:10px;font-weight:800;color:var(--text-muted);width:52px;">ПО X</span>
+              <input type="range" id="ava-ox" min="-100" max="100" value="0" step="1" style="flex:1;"
+                oninput="drawAvaUpload()">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+              <span style="font-size:10px;font-weight:800;color:var(--text-muted);width:52px;">ПО Y</span>
+              <input type="range" id="ava-oy" min="-100" max="100" value="0" step="1" style="flex:1;"
+                oninput="drawAvaUpload()">
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn go" style="flex:1;padding:10px;" onclick="applyAvaUpload()">✓ ПРИМЕНИТЬ</button>
+              <button class="btn"
+                style="flex:0 0 auto;padding:10px 14px;background:var(--surface-light);color:var(--text-muted);box-shadow:none;font-size:16px;"
+                onclick="document.getElementById('ava-file-input').click()">📷</button>
+            </div>
+          </div>
+          <div style="text-align:center;margin-bottom:16px;">
+            <div class="title-badge-display none-title" id="equipped-title-badge"
+              onclick="goAchievements(document.getElementById('nav-ach'))">
+              <span id="equipped-title-icon">🎖️</span>
+              <span id="equipped-title-text">Нет титула</span>
+            </div>
+          </div>
+
+          <div class="streak-row">
+            <div class="streak-pill">🔥 <span id="p-streak">3</span> дней</div>
+            <div class="streak-pill">⚡ <span id="p-xp">0</span> XP</div>
+            <div class="streak-pill">✅ <span id="p-lessons">0/5</span></div>
+          </div>
+
+          <!-- OVERALL PROGRESS STATS -->
+          <div id="overall-stats-block"
+            style="margin:12px 0 4px;background:var(--surface-light);border-radius:16px;padding:14px 16px;">
+            <div
+              style="font-size:11px;font-weight:800;color:var(--text-muted);letter-spacing:1.5px;margin-bottom:10px;">📊
+              ОБЩИЙ ПРОГРЕСС</div>
+            <div style="display:flex;gap:10px;margin-bottom:12px;">
+              <div style="flex:1;text-align:center;">
+                <div style="font-size:26px;font-weight:900;color:var(--primary);" id="stat-lessons-pct">0%</div>
+                <div style="font-size:10px;color:var(--text-muted);font-weight:700;">УРОКОВ</div>
+              </div>
+              <div style="flex:1;text-align:center;">
+                <div style="font-size:26px;font-weight:900;color:var(--gold);" id="stat-tests-pct">0%</div>
+                <div style="font-size:10px;color:var(--text-muted);font-weight:700;">ТЕСТОВ</div>
+              </div>
+              <div style="flex:1;text-align:center;">
+                <div style="font-size:26px;font-weight:900;color:#9B59B6;" id="stat-perfect-pct">0%</div>
+                <div style="font-size:10px;color:var(--text-muted);font-weight:700;">ИДЕАЛЬНО</div>
+              </div>
+            </div>
+            <div style="height:8px;background:var(--surface);border-radius:8px;overflow:hidden;margin-bottom:4px;">
+              <div id="stat-total-bar"
+                style="height:100%;border-radius:8px;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:width 0.6s;width:0%;">
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:4px;" id="stat-total-label">
+              Общий прогресс: 0%</div>
+          </div>
+
+          <!-- Profile Tabs -->
+          <div class="prof-tabs">
+            <div class="prof-tab active" id="ptab-edit" onclick="switchProfTab('edit')">Профиль</div>
+            <div class="prof-tab" id="ptab-look" onclick="switchProfTab('look')">Внешний вид</div>
+            <div class="prof-tab" id="ptab-devs" onclick="switchProfTab('devs')">Разрабы</div>
+          </div>
+
+          <!-- Tab: Edit -->
+          <div id="ptab-content-edit">
+            <div class="edit-section">
+              <div class="edit-label">Имя</div>
+              <input class="edit-field" id="edit-name" type="text" maxlength="24" placeholder="Твоё имя" value="" />
+            </div>
+            <div class="edit-section">
+              <div class="edit-label">Имя пользователя</div>
+              <div class="username-row">
+                <span class="username-at">@</span>
+                <input class="edit-field" id="edit-username" type="text" maxlength="20" placeholder="username" value=""
+                  style="flex:1;" />
+              </div>
+            </div>
+            <div class="edit-section">
+              <div class="edit-label">О себе</div>
+              <textarea class="edit-field" id="edit-bio" maxlength="80" placeholder="Расскажи о себе..." rows="2"
+                style="resize:none; line-height:1.5;"></textarea>
+            </div>
+            <div class="save-wrap" style="display:flex;gap:8px;">
+              <button class="btn go" style="flex:1;min-width:0;" onclick="saveProfile()">СОХРАНИТЬ</button>
+              <button class="btn bad" style="flex:1;min-width:0;" onclick="confirmReset()">🗑️ СБРОС</button>
+            </div>
+          </div>
+
+          <!-- Tab: Look -->
+          <div id="ptab-content-look" style="display:none;">
+            <div class="edit-section">
+              <div class="edit-label">Цвет фона баннера</div>
+              <div id="banner-bg-row" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;"></div>
+            </div>
+            <div class="edit-section">
+              <div class="edit-label">Узор баннера</div>
+              <div id="banner-pattern-row" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
+            </div>
+            <div style="padding-bottom:20px;display:flex;gap:8px;">
+              <button class="btn go" style="flex:1;min-width:0;" onclick="saveProfile()">СОХРАНИТЬ</button>
+              <button class="btn bad" style="flex:1;min-width:0;" onclick="confirmReset()">🗑️ СБРОС</button>
+            </div>
+            <!-- SECRET CODE PANEL -->
+            <div class="edit-section" style="margin-top:8px;">
+              <div class="edit-label" style="letter-spacing:2px;">🔒 СЕКРЕТНЫЙ КОД</div>
+              <div style="display:flex;gap:10px;align-items:center;">
+                <input class="edit-field" id="secret-code-input" type="text" maxlength="20" placeholder="Введи код..."
+                  style="flex:1;font-family:monospace;letter-spacing:2px;text-transform:uppercase;"
+                  oninput="this.value=this.value.toUpperCase()" />
+                <button class="btn go" style="width:auto;padding:14px 20px;white-space:nowrap;"
+                  onclick="trySecretCode()">ВВЕСТИ</button>
+              </div>
+              <div id="secret-result" style="font-size:12px;font-weight:800;margin-top:8px;min-height:18px;"></div>
+            </div>
+
+          </div>
+
+
+          <!-- Tab: Devs -->
+          <div id="ptab-content-devs" style="display:none;">
+            <div style="text-align:center;padding:8px 0 20px;">
+              <div
+                style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;">
+                КОМАНДА ПРОЕКТА</div>
+              <div style="font-size:13px;color:var(--text-muted);line-height:1.5;">Проект создан школьниками
+                и<br>энтузиастами образования</div>
+            </div>
+            <div id="devs-cards-list"></div>
+
+            <!-- Методисты (static) -->
+            <div
+              style="background:var(--surface);border:1.5px solid var(--surface-light);border-radius:18px;padding:18px;margin-bottom:20px;">
+              <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
+                <div
+                  style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#58CC02,#46A302);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">
+                  📚</div>
+                <div>
+                  <div style="font-size:15px;font-weight:900;color:var(--primary);">Команда педагогов</div>
+                  <div style="font-size:11px;color:var(--text-muted);font-weight:700;margin-top:2px;">Методисты</div>
+                </div>
+              </div>
+              <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">Проверяют соответствие заданий ФГОС и
+                школьным программам.</div>
+            </div>
+
+            <!-- Links -->
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+              <a href="https://geltgolem.github.io" target="_blank"
+                style="display:flex;align-items:center;gap:12px;background:var(--surface);border:1.5px solid var(--surface-light);border-radius:14px;padding:14px;text-decoration:none;color:var(--text);">
+                <span style="font-size:20px;">🌐</span>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:800;">Сайт проекта</div>
+                  <div style="font-size:11px;color:var(--text-muted);">geltgolem.github.io</div>
+                </div>
+                <span style="font-size:16px;color:var(--text-muted);">›</span>
+              </a>
+              <a href="https://t.me/geltgolem" target="_blank"
+                style="display:flex;align-items:center;gap:12px;background:var(--surface);border:1.5px solid var(--surface-light);border-radius:14px;padding:14px;text-decoration:none;color:var(--text);">
+                <span style="font-size:20px;">✈️</span>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:800;">Telegram-канал</div>
+                  <div style="font-size:11px;color:var(--text-muted);">@geltgolem</div>
+                </div>
+                <span style="font-size:16px;color:var(--text-muted);">›</span>
+              </a>
+            </div>
+
+            <div style="text-align:center;padding:0 0 20px;">
+              <div style="font-size:11px;color:var(--text-muted);font-weight:700;">© 2025–2026 Gelt · Все права защищены
+              </div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Сделано с любовью к школьному
+                программированию 🇷🇺</div>
+            </div>
+          </div>
+
+          <!-- AVATAR MODAL -->
+          <div class="modal-overlay" id="ava-modal" onclick="closeAvaModal(event)">
+            <div class="modal-sheet">
+              <div class="modal-title">Настроить персонажа</div>
+              <div class="modal-subtitle">Выбери внешний вид своего героя</div>
+
+              <div class="char-preview-wrap">
+                <div class="char-preview" id="modal-char-preview">
+                  <svg id="modal-char-svg" viewBox="0 0 100 115" xmlns="http://www.w3.org/2000/svg" width="120"
+                    height="120"></svg>
+                </div>
+              </div>
+
+              <div class="char-tabs">
+                <button class="char-tab active" onclick="switchCharTab('body')">🧍 Тело</button>
+                <button class="char-tab" onclick="switchCharTab('outfit')">👕 Одежда</button>
+                <button class="char-tab" onclick="switchCharTab('mask')">🎭 Маска</button>
+                <button class="char-tab" onclick="switchCharTab('bg')">🌈 Фон</button>
+              </div>
+
+              <div id="char-tab-body">
+                <div class="edit-label">Скин</div>
+                <div class="custom-grid" id="body-grid"></div>
+              </div>
+              <div id="char-tab-outfit" style="display:none;">
+                <div class="edit-label">Наряд</div>
+                <div class="custom-grid" id="outfit-grid"></div>
+              </div>
+              <div id="char-tab-mask" style="display:none;">
+                <div class="edit-label">Маска / Аксессуар</div>
+                <div class="custom-grid" id="mask-grid"></div>
+              </div>
+              <div id="char-tab-bg" style="display:none;">
+                <div class="edit-label">Фон аватара</div>
+                <div class="custom-grid" id="bg-grid"></div>
+              </div>
+
+              <button class="btn go" onclick="confirmAvatar()">ГОТОВО</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /scr-profile -->
+
+      <!-- LEADERBOARD -->
+      <div id="scr-lb" class="screen" style="padding-bottom:10dvh;">
+        <div class="lb-header">
+          <h2>🏅 Таблица лидеров</h2>
+          <p id="lb-sub-label">Топ игроков этой недели</p>
+        </div>
+        <div id="lb-list"></div>
+      </div>
+
+      <!-- ACHIEVEMENTS -->
+      <div id="scr-ach" class="screen" style="padding-bottom:10dvh;">
+        <div class="ach-header">
+          <h2>🏅 Достижения</h2>
+          <p id="ach-count-label">0 разблокировано</p>
+        </div>
+
+        <div class="ach-section-title">📚 ПРОГРЕСС МОДУЛЕЙ</div>
+        <div class="ach-grid" id="ach-grid-modules"></div>
+
+        <div class="ach-section-title">⚡ XP И ЛИГИ</div>
+        <div class="ach-grid" id="ach-grid-xp"></div>
+
+        <div class="ach-section-title">🔥 СЕРИИ И АКТИВНОСТЬ</div>
+        <div class="ach-grid" id="ach-grid-streak"></div>
+
+        <div class="ach-section-title">🏆 ТЕСТЫ И МАСТЕРСТВО</div>
+        <div class="ach-grid" id="ach-grid-mastery"></div>
+
+        <div class="ach-section-title">🎖️ ТИТУЛЫ</div>
+        <div class="titles-list" id="titles-list"></div>
+
+        <div class="ach-section-title">🎁 РАЗБЛОКИРОВАННЫЕ НАГРАДЫ</div>
+        <div id="rewards-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:4px;"></div>
+      </div>
+
+      <!-- LEAGUE -->
+      <div id="scr-league" class="screen" style="padding:0;">
+        <div id="league-banner"
+          style="padding:28px 20px 24px; text-align:center; position:relative;margin-bottom: 24px;">
+          <div
+            style="font-size:11px;font-weight:800;letter-spacing:1.5px;color:rgba(255,255,255,0.6);text-transform:uppercase;margin-bottom:12px;">
+            ТЕКУЩАЯ ЛИГА</div>
+          <div id="league-trophy"></div>
+          <div id="league-name-big"
+            style="font-size:26px;font-weight:900;color:white;text-shadow:0 2px 12px rgba(0,0,0,0.4);"></div>
+          <div id="league-xp-range" style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:4px;font-weight:700;">
+          </div>
+        </div>
+        <div style="padding:0 20px 20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-size:12px;font-weight:800;color:var(--text-muted);">ПРОГРЕСС ДО СЛЕДУЮЩЕЙ ЛИГИ</span>
+            <span id="league-pct" style="font-size:12px;font-weight:800;color:var(--gold);"></span>
+          </div>
+          <div style="height:14px;background:var(--surface-light);border-radius:7px;overflow:hidden;">
+            <div id="league-bar" style="height:100%;border-radius:7px;transition:width 0.6s;width:0%;"></div>
+          </div>
+          <div id="league-next-label"
+            style="font-size:11px;color:var(--text-muted);margin-top:6px;text-align:right;font-weight:700;"></div>
+        </div>
+        <div style="padding:0 20px 20px;margin-bottom:10dvh">
+          <div
+            style="font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--text-muted);text-transform:uppercase;margin-bottom:14px;">
+            ВСЕ ЛИГИ</div>
+          <div id="all-leagues" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+      </div>
+
+    </main>
+
+    <nav class="nav">
+      <div class="nav-item active" id="nav-home" onclick="goHome(this)">
+        <div class="nav-icon">🏠</div><span>Главная</span>
+      </div>
+      <div class="nav-item" id="nav-league" onclick="goLeague(this)">
+        <div class="nav-icon">🏆</div><span>Лига</span>
+      </div>
+      <div class="nav-item" id="nav-lb" onclick="goLeaderboard(this)">
+        <div class="nav-icon">📊</div><span>Рейтинг</span>
+      </div>
+      <div class="nav-item" id="nav-ach" onclick="goAchievements(this)">
+        <div class="nav-icon">🏅</div><span>Успехи</span>
+      </div>
+      <div class="nav-item" id="nav-profile" onclick="goProfile(this)">
+        <div class="nav-icon">👤</div><span>Профиль</span>
+      </div>
+    </nav>
+  </div>
+  <script src="js/main.js"></script>
+</body>
+
+</html>

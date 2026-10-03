@@ -1,0 +1,185 @@
+/* =========================================
+   ACTION BUTTON (.aBtn)
+   ========================================= */
+
+:root {
+    --btn-radius: var(--brc);
+    --btn-radius-soft: var(--br);
+
+    /* Primary кнопки (акцентные) */
+    --btn-pri-bg: var(--accent);
+    --btn-pri-bg-hover: var(--accent-hover);
+    --btn-pri-bg-active: var(--accent-active);
+    --btn-pri-text: var(--text-on-accent);
+
+    /* Secondary кнопки (вторичные) */
+    --btn-sec-bg: var(--bg-sec-solid);
+    --btn-sec-bg-hover: var(--bg-sec-hover);
+    --btn-sec-bg-active: color-mix(in srgb, var(--bg-sec-solid) 70%, var(--c-black));
+    --btn-sec-text: var(--text-pri);
+
+    /* Ghost кнопки (текстовые) */
+    --btn-ghost-bg: transparent;
+    --btn-ghost-bg-hover: var(--ac-bg-light);
+    --btn-ghost-bg-active: color-mix(in srgb, var(--ac-bg-light) 70%, var(--c-black));
+    --btn-ghost-text: var(--accent);
+
+    /* Bordered кнопки (контурные) */
+    --btn-bordered-bg: transparent;
+    --btn-bordered-bg-hover: var(--bg-sec-hover);
+    --btn-bordered-bg-active: color-mix(in srgb, var(--bg-sec-solid) 80%, var(--c-black));
+    --btn-bordered-border: var(--border-color);
+    --btn-bordered-text: var(--text-pri);
+
+    /* Danger кнопки (опасные) */
+    --btn-danger-bg: var(--danger);
+    --btn-danger-bg-hover: var(--danger-hover);
+    --btn-danger-bg-active: color-mix(in srgb, var(--danger) 70%, var(--c-black));
+    --btn-danger-text: var(--c-white);
+
+    --btn-disabled-opacity: 0.4;
+}
+
+button {
+    border-radius: var(--br);
+    background-color: var(--bg-sec);
+    border: 1px solid var(--bc);
+    color: var(--text-pri);
+    padding: var(--dss);
+    transition: background var(--tr-in), color var(--tr-in), transform var(--tr-in);
+
+    @media (hover: hover) { &:hover {
+        transform: scale(1.05);
+    }}
+    .hover {
+        background-color: var(--bg-sec-hover);
+        border-color: var(--text-sec);
+        color: var(--text-sec);
+        cursor: pointer;
+        text-decoration: underline;
+    }
+    &:active {
+        transform: scale(0.95);
+        padding: 0 var(--ds);
+    }
+}
+
+.aBtn {
+    /* База */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--dss);
+    padding: 0.75rem 1.5rem;
+    border: 2px solid transparent;
+    border-radius: var(--brc);
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: var(--tr-color), transform var(--tr-in), box-shadow var(--tr-in-out);
+
+    /* Primary (по умолчанию) */
+    background-color: var(--btn-pri-bg);
+    color: var(--btn-pri-text);
+
+    &:hover:not(:disabled) {
+        background-color: var(--btn-pri-bg-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active:not(:disabled) {
+        background-color: var(--btn-pri-bg-active);
+        transform: scale(0.96) translateY(0);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--focus-ring);
+        outline-offset: 3px;
+    }
+
+    /* Secondary */
+    &.sec {
+        background-color: var(--btn-sec-bg);
+        color: var(--btn-sec-text);
+
+        &:hover:not(:disabled) {
+        background-color: var(--btn-sec-bg-hover);
+        }
+
+        &:active:not(:disabled) {
+        background-color: var(--btn-sec-bg-active);
+        }
+    }
+
+    /* Ghost */
+    &.ghost {
+        background-color: var(--btn-ghost-bg);
+        color: var(--btn-ghost-text);
+        padding-left: 1rem;
+        padding-right: 1rem;
+
+        &:hover:not(:disabled) {
+        background-color: var(--btn-ghost-bg-hover);
+        }
+
+        &:active:not(:disabled) {
+        background-color: var(--btn-ghost-bg-active);
+        }
+    }
+
+    /* Danger */
+    &.danger {
+        background-color: var(--btn-danger-bg);
+        color: var(--btn-danger-text);
+
+        &:hover:not(:disabled) {
+        background-color: var(--btn-danger-bg-hover);
+        }
+
+        &:active:not(:disabled) {
+        background-color: var(--btn-danger-bg-active);
+        }
+    }
+
+    /* Bordered */
+    &.bordered {
+        background-color: var(--btn-bordered-bg);
+        border-color: var(--btn-bordered-border);
+        color: var(--btn-bordered-text);
+
+        &:hover:not(:disabled) {
+        background-color: var(--btn-bordered-bg-hover);
+        border-color: var(--text-pri-hover);
+        }
+
+        &:active:not(:disabled) {
+        background-color: var(--btn-bordered-bg-active);
+        }
+
+        &.aBtn--dotted,
+        &.dotted {
+        border-style: dotted;
+        }
+    }
+
+    /* Disabled (универсальный) */
+    &:disabled,
+    &.is-disabled {
+        opacity: var(--btn-disabled-opacity);
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+        pointer-events: none;
+    }
+}
+
+.aBtn svg, 
+.aBtn img {
+  flex-shrink: 0;  transition: transform var(--tr-in);
+}
+
+.aBtn:hover:not(:disabled) svg {
+  transform: scale(1.1);
+}

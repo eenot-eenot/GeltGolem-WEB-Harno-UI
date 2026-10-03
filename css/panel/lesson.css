@@ -1,0 +1,28 @@
+#lesson {
+    .page-header {
+        display: none;
+    }
+
+    .page-header-btns, .lefthead {
+        display: inline-flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: var(--ds);
+
+        .progress-track {
+            width: 100%;
+        }
+    }
+
+    .lefthead {
+        width: 100%;
+    }
+
+    #act-area {
+        position: absolute;
+        left: var(--ds);
+        right: var(--ds);
+        bottom: var(--ds);
+    }
+}

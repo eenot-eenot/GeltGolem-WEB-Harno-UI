@@ -1,0 +1,417 @@
+@import url("compibality.css");
+@import url("themes/light.css");
+@import url("themes/oled.css");
+
+/* Theme colors */
+:root {
+    --c-black: #000000;
+    --c-white: #ffffff;
+    
+    /* Оттенки серого для темной темы */
+    --c-gray-900: #0e0f0e; /* фон */
+    --c-gray-800: #242424; /* поверхности (карточки) */
+    --c-gray-700: #313131; /* поля ввода */
+    --c-gray-600: #404040; /* границы */
+    --c-gray-400: #a0a0a0; /* доп текст */
+    --c-gray-200: #e0e0e0; /* основной текст */
+    --c-gray-100: #f7f7f7; /* светлый текст/иконки */
+
+    /* Акцентные и статусные цвета */
+    --c-accent: #3498db;
+    --c-danger: #e74c3c;
+    --c-success: #2ecc71;
+    --c-warning: #f1c40f;
+
+    /* Фоны */
+    --bg-base: var(--c-gray-900);
+    --bg-pri: var(--c-gray-900);
+    --bg-sec: var(--c-gray-800);
+    --bg-sec-solid: var(--c-gray-800);
+    --bg-input: var(--c-gray-700);
+
+    /* Текст */
+    --text-pri: var(--c-gray-200);
+    --text-sec: var(--c-gray-400);
+    --text-on-accent: var(--c-white);
+
+    /* Границы и акценты */
+    --border-color: var(--c-gray-600);
+    --bc: var(--border-color);
+    --accent: var(--c-accent);
+    --danger: var(--c-danger);
+
+    /* =========================================
+        АВТОМАТИЧЕСКИЕ СОСТОЯНИЯ
+        ========================================= */
+        
+    --accent-dark: color-mix(in srgb, var(--c-accent) 75%, var(--c-black));
+    
+    /* базовый цвет + 10-15% белого */
+    --bg-pri-hover: color-mix(in srgb, var(--bg-pri) 85%, var(--c-white));
+    --bg-sec-hover: color-mix(in srgb, var(--bg-sec) 85%, var(--c-white));
+    --bg-input-hover: color-mix(in srgb, var(--bg-input) 85%, var(--c-white));
+    
+    /* с черным */
+    --accent-hover: color-mix(in srgb, var(--accent) 85%, var(--c-white));
+    --accent-active: color-mix(in srgb, var(--accent) 70%, var(--c-black));
+    --accent-dark-hover: color-mix(in srgb, var(--accent-dark) 85%, var(--c-white));
+    --accent-dark-active: color-mix(in srgb, var(--accent-dark) 70%, var(--c-black));
+    
+    --danger-hover: color-mix(in srgb, var(--danger) 85%, var(--c-white));
+    --danger-bg-alpha: color-mix(in srgb, var(--danger) 15%, transparent); /* прозрачный красный фон */
+
+    --text-pri-hover: color-mix(in srgb, var(--text-pri) 80%, var(--c-white));
+    --text-sec-hover: color-mix(in srgb, var(--text-sec) 80%, var(--c-white));
+
+    --br: 1.2rem;
+    --brs: 0.9rem;
+    --brc: 99999px;
+    --brr: var(--brc);
+
+    --ds: 1rem;
+    --dss: 0.5rem;
+    --ds2: calc(var(--ds) * 2);
+    --dss2: calc(var(--dss) * 2);
+
+    /* Размеры текста */
+    --text-size-title-big:      3.00rem;
+    --text-size-title:          2.25rem;
+    --text-size-head:           1.50rem;
+    --text-size-subtitle:       1.25rem;
+    --text-size-subheading:     1.10rem;
+    --text-size-body:           1.00rem;
+    --text-size-small:          0.90rem;
+
+    --text-weight-title-big:    800;
+    --text-weight-title:        700;
+    --text-weight-head:         600;
+    --text-weight-subtitle:     600;
+    --text-weight-subheading:   500;
+    --text-weight-body:         400;
+    --text-weight-small:        400;
+
+    --overlay-bg: rgba(0, 0, 0, 0.6); /* затемнение под модалкой */
+    --glass-blur: blur(20px);          /* матовое стекло !!! использовать осторожно !!! */  
+    --focus-ring: color-mix(in srgb, var(--accent) 50%, transparent);
+
+    --transitions: 0.3s ease;
+    --tr-out: 0.25s cubic-bezier(0.2, 0.0, 0.0, 1);
+    --tr-in: 0.25s cubic-bezier(0.4, 0.0, 1, 1);
+    --tr-in-out: 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
+    --tr-color: background-color 0.2s var(--tr-in-out), color 0.2s var(--tr-in-out);
+
+    --height: 16px;
+    --safe-area-top: 0px;
+    --safe-area-bottom: 0px;
+}
+
+* {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    scrollbar-width: thin;
+    scrollbar-color: var(--text-sec) var(--bg-sec);
+    color: var(--text-pri);
+    transition: var(--transitions); /* заменено с --tr */
+}
+
+option {
+    background-color: var(--bg-input); /* заменено с --bg-sec-great */
+    color: var(--text-pri);
+    border-radius: var(--br);
+}
+
+@font-face {
+    font-family: 'onesans';
+    src: url(../../fonts/oneuisans.ttf);
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* --- Базовый стиль --- */
+body {
+    margin: 0;
+    color: #f7f7f7;
+    font-family: 'onesans', BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #303027, #1C2125, #1F2120);
+    font-family: 'onesans', 'Inter', sans-serif !important;
+    min-height: 100dvh;
+    overflow-y: hidden;
+}
+
+html {
+    overflow-y: hidden;
+    /*padding-top: max(env(safe-area-inset-top, 0px), var(--safe-area-top));*/
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-area-bottom));
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+}
+
+a {
+  color: var(--text-pri);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: var(--text-sec);
+}
+
+fieldset {
+    border-radius: var(--br);
+}
+
+video {
+    border-radius: var(--br);
+}
+
+/* -------------------------
+   Input (HTML <input>)
+   ------------------------- */
+
+:where(input, textarea, select) {
+    padding: var(--dss);
+    margin: 0;
+    border: 1px solid var(--bc);
+    border-radius: var(--br);
+    font-size: 14px;
+    background-color: var(--bg-input);
+    color: var(--text-pri);
+    min-height: 20px;
+    background-image: none;
+    background-repeat: no-repeat;
+    background-position-y: center;
+    background-position-x: right;
+    background-position-x: calc(100% - 0.5rem);
+
+    &:hover:not(:disabled) {
+        background-color: var(--bg-input-hover);
+    }
+
+    &:focus {
+        outline: none;
+        border-color: var(--accent); /* заменено с --ac-text */
+        background-repeat: no-repeat;
+        background-position-y: center;
+        background-position-x: right;
+        background-position-x: calc(100% - 0.5rem);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background-color: #242424;
+    }
+}
+
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, input[type="url"]:focus, input[type="search"]:focus, textarea:focus {
+    background-image: url(../../img/ui/text.svg);
+}
+
+input[type="number"]:focus {
+    background-image: url(../../img/ui/number.svg);
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    width: 25px;
+    border: 2px solid var(--bc);
+    border-radius: 6px;
+    background-color: var(--text-pri);
+    display: inline-block;
+    vertical-align: middle;
+    aspect-ratio: 1;
+    transition: background-color 0.25s, border-color 0.25s, box-shadow 0.2s;
+    min-height: 10px;
+}
+
+/* При наведении */
+input[type="checkbox"]:hover,
+input[type="radio"]:hover {
+    box-shadow: 0 0 1px var(--accent-hover); /* заменено с --ac-bg-great-hover */
+}
+
+/* Активное состояние */
+input[type="checkbox"]:checked {
+    background-color: var(--accent-active); /* заменено с --ac-bg-great-light */
+    border-color: var(--bc);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 12px;
+}
+
+/* Радиокнопки — круглые */
+input[type="radio"] {
+    border-radius: 50%;
+}
+
+input[type="radio"]:checked {
+    background-color: var(--accent-hover); /* заменено с --ac-bg-hover */
+    border-color: var(--bc);
+    box-shadow: inset 0 0 0 1px #fff, inset 0 0 0 2px #433323;
+}
+
+input, select {
+    margin: 0;
+    margin: var(--dss) 0;
+}
+
+select {
+    appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding: 0.5rem;
+}
+
+textarea {
+    border-radius: var(--br) var(--br) 0 var(--br);
+}
+
+/* -------------------------
+   Progress (HTML <progress>)
+   ------------------------- */
+
+progress {
+    width: 100%;
+    height: var(--height);
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    border: none;
+    border-radius: var(--br);
+    overflow: hidden;
+}
+
+/* WebKit / Blink: общий трек */
+progress::-webkit-progress-bar {
+    background: var(--bg-sec);
+    border-radius: var(--br);
+    height: var(--height);
+    box-shadow: inset 0 1px 0 rgba(0,0,0,0.03);
+}
+
+/* WebKit / Blink: заполненная часть */
+progress::-webkit-progress-value {
+    background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 75%, black 10%)); /* заменено с --ac-text */
+    height: var(--height);
+    border-radius: var(--br);
+    transition: width 220ms ease;
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08);
+}
+
+.progress-wrap {
+    padding: 8px 0;
+}
+
+/* вариант тонкого трека */
+.progress-slim progress { height: 8px; --height: 8px; }
+
+/* -------------------------
+      Meter (HTML <meter>)
+   ------------------------- */
+
+meter {
+    width: 100%;
+    height: var(--height);
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--bg-sec);
+    border-radius: var(--br);
+    overflow: hidden;
+    display: block;
+    box-shadow: inset 0 1px 0 rgba(0,0,0,0.03);
+}
+
+meter::-webkit-meter-bar {
+    background: var(--bg-sec);
+    border-radius: var(--br);
+}
+
+meter::-webkit-meter-optimum-value {
+    background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 75%, black 10%)); /* заменено с --ac-text */
+    height: var(--height);
+    border-radius: var(--br);
+    transition: width 220ms ease;
+}
+
+meter::-webkit-meter-suboptimum-value {
+    background: linear-gradient(90deg, #ffb84d, #ff8a00);
+    height: var(--height);
+    border-radius: var(--br);
+}
+
+meter::-webkit-meter-even-less-good-value {
+    background: linear-gradient(90deg, var(--danger), #b71c1c);
+    height: var(--height);
+    border-radius: var(--br);
+}
+
+.hidden {
+    display: none;
+}
+
+.hidden.active {
+    display: block;
+}
+
+.hidden_save {
+    visibility: hidden;
+}
+
+.hidden_save.active {
+    visibility: visible;
+}
+
+.dev_thing {
+    display: none !important;
+}
+
+body.dev_mode .dev_thing {
+    display: flex !important;
+}
+
+html body .page.active {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    max-height: 100dvh;
+    overflow-y: auto;
+}
+
+body {
+    background: var(--bg-base);
+}
+
+fieldset {
+    background-color: var(--bg-pri);
+}
+
+legend {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.bg {
+    background-color: var(--bg-sec);
+    padding: var(--ds);
+    border-radius: var(--br);
+    margin: var(--ds) 0;
+}
+
+.flex {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds);
+    
+    &.land {
+        flex-direction: row;
+    }
+}
+
+.vertical {
+    &:not(input[type="range"]) {
+        transform: rotate(90deg);
+    }
+}
