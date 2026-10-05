@@ -115,7 +115,6 @@
         width: 100%;
             min-height: 40px;
             max-height: 40px;
-        transition: var(--tr-in-out);
         border: none;
         &.active {
             background-color: var(--bg-sec-hover);
@@ -148,8 +147,8 @@
     z-index: 50;
 
     overflow-y: hidden;
+    max-width: 100dvw;
     max-height: 100px;
-    transition: max-height 0.2 ease;
 
     &.noname {
         span {
@@ -166,18 +165,28 @@
         left: calc(-1 * var(--ds));
         right: calc(-1 * var(--ds));
         bottom: 0;
-        padding: 0 var(--ds) calc(env(safe-area-inset-bottom) + var(--ds)) var(--ds);
+        padding: 0 var(--ds) calc(var(--safe-area-bottom, env(safe-area-inset-bottom, 0px)) + var(--ds)) var(--ds);
     }
     &.floating {
         position: absolute;
         left: calc(var(--ds) * 1.5);
         right: calc(var(--ds) * 1.5);
-        bottom: calc(var(--ds) * 1.5);
+        bottom: calc(var(--ds) * 1.5 + var(--safe-area-bottom, env(safe-area-inset-bottom, 0px)));
         padding: var(--dss);
         margin: 0 auto;
         justify-content: space-between;
         border-radius: var(--brr);
         border: 1px solid var(--bc);
+
+        transition: max-height 0.5s linear(0, 0 50%, 1),
+                    max-width 0.75s linear(0, 0 33%, 1),
+                    padding 0.5s linear(0, 0 50%, 1),
+                    border-width 0.25s linear(0, 1);
+
+        scrollbar-width: none;
+        &::-webkit-scrollbar {
+            display: none;
+        }
 
         .navbtn {
             height: calc(40px + var(--ds));
@@ -191,8 +200,17 @@
 
     &.hidden {
         max-height: 0;
+        max-width: 0;
         padding: 0;
         border-width: 0;
+        overflow-x: hidden;
+        align-items: center;
+        justify-content: center;
+        
+        transition: max-height 0.7s ease,
+                    max-width 1s ease,
+                    padding 0.7s ease,
+                    border-width 1.2s linear(0, 0 20%, 0 83%, 1);
     }
 
     .navbtn {

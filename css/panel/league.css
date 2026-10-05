@@ -1,0 +1,10 @@
+#league {
+    .page-header {
+        img {
+            --size: 111px;
+            width: var(--size);
+            height: var(--size);
+            filter: drop-shadow(rgba(122, 138, 154, 0.533) 0px 4px 16px);
+        }
+    }
+}

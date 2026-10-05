@@ -19,6 +19,14 @@
         width: 100%;
     }
 
+    .pageContent {
+        min-height: max-content;
+        height: calc(100% - 77px);
+    }
+    .pageContainer {
+        height: 100%;
+    }
+
     #act-area {
         position: absolute;
         left: var(--ds);

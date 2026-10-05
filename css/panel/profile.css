@@ -1,0 +1,33 @@
+#profile {
+    .page-header {
+        position: relative;
+
+        .profileHalfBg {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-base);
+        }
+
+        .ava-wrap {
+            text-align: center;
+            z-index: 5;
+            position: relative;
+            padding-top: calc(50% - 100px);
+        }
+        .ava {
+            width: 88px;
+            height: 88px;
+        }
+
+        h1, h3, #badgeContainer {
+            z-index: 5;
+        }
+
+        #badgeContainer {
+            margin-top: var(--dss);
+        }
+    }
+}

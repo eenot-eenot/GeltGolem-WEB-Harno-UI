@@ -642,16 +642,6 @@
     margin-left: 10px;
 }
 
-/* CHARACTER AVATAR */
-.ava-wrap {
-    position: absolute;
-    bottom: -50px;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    z-index: 5;
-}
-
 .ava {
     width: 100px;
     height: 100px;
@@ -846,11 +836,6 @@
 
 .custom-item.bg-item {
     font-size: 0;
-}
-
-/* EDIT FIELDS */
-.prof-body {
-    padding-top: 64px;
 }
 
 .edit-section {
@@ -2041,6 +2026,6 @@ body {
     border: 2px solid var(--gold);
 }
 
-.btn.go, .opt {
+.btn.go, .opt, .btn.bad {
     padding: var(--ds) !important;
 }

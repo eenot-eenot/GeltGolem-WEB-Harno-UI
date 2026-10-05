@@ -5,6 +5,9 @@ window.eelib = {
         maxDown: 5,
         noName: true,
     },
+    theme: {
+        blackDown: true,
+    }
 };
 
 window.eelib.pages = [
@@ -28,21 +31,31 @@ window.eelib.pages = [
         id: 'league',
         title: 'Лига',
         icon: 'img/nav/league.png',
+        iconHead: 'img/league/icon/stone.svg'
     },
     {
         id: 'leaderboard',
         title: 'Рейтинг',
+        titleHead: '🏅 Таблица лидеров',
+        description: 'Топ игроков этой недели',
         icon: 'img/nav/leaderboard.svg',
     },
     {
         id: 'achivements',
         title: 'Достижения',
+        titleHead: '🏅 Достижения',
+        description: '0 разблокировано',
         icon: 'img/nav/achivements.png',
     },
     {
         id: 'profile',
         title: 'Профиль',
         icon: 'img/ui/user.svg',
+        subcategories: [
+            'Профиль',
+            'Дизайн',
+            'Разработчики'
+        ]
     },
     {
         id: 'langmodule',

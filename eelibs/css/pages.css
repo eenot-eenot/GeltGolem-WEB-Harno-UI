@@ -47,6 +47,9 @@
         overflow-x: auto;
     }
 }
+body.nav-floating .page .pageContent {
+    padding-bottom: calc(60px + var(--ds) * 3 + var(--safe-area-bottom, env(safe-area-inset-bottom, 0px)));
+}
 
 #content.modal-open .page.active, #navdown.modal-open {
     @media (orientation: portrait) {
@@ -240,4 +243,13 @@
 
 .page-header, .page-header-btns, .pageContent {
     background-color: var(--bg-base);
+}
+
+#blackDown {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
 }

@@ -114,10 +114,6 @@ function loadState() {
         }
         if (d.unlockedSecrets) unlockedSecrets = new Set(d.unlockedSecrets);
         if (d.profileData) profileData = Object.assign(profileData, d.profileData);
-        if (d.emperorMode) {
-            _emperorMode = true;
-            setTimeout(() => initAvaUpload(), 200);
-        }
         // Re-register username in registry (in case of first load on new device)
         if (profileData.username) {
             try {
@@ -294,8 +290,8 @@ function applyUsername(username, name, bio) {
     if (editName) editName.value = profileData.name;
     if (editUser) editUser.value = username;
     if (editBio) editBio.value = profileData.bio;
-    const dispName = document.getElementById('prof-disp-name');
-    const dispUser = document.getElementById('prof-disp-user');
+    const dispName = document.querySelector('#profile .page-header h1');
+    const dispUser = document.querySelector('#profile .page-header h3');
     if (dispName) dispName.textContent = profileData.name;
     if (dispUser) dispUser.textContent = '@' + username;
     renderDevBadgeIfNeeded();
@@ -1898,8 +1894,8 @@ function actClick() { if (!answered) checkAnswer(); }
 window.actClick = actClick
 
 function showToast(msg, duration = 1500) {
-    window.notification.success(msg)
-    return
+    /*window.notification.success(msg)
+    return*/
 
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -2495,7 +2491,7 @@ function countUnlocked() {
 
 function renderAchievements() {
     const total = Object.values(ACHIEVEMENTS).reduce((s, arr) => s + arr.length, 0);
-    document.getElementById('ach-count-label').textContent = `${countUnlocked()} из ${total} разблокировано`;
+    document.querySelector('#achivements .page-header h3').textContent = `${countUnlocked()} из ${total} разблокировано`;
 
     function renderGroup(arr, elId) {
         const el = document.getElementById(elId);
@@ -2603,19 +2599,55 @@ function renderProfileScreen() {
     document.getElementById('edit-name').value = profileData.name;
     document.getElementById('edit-username').value = profileData.username;
     document.getElementById('edit-bio').value = profileData.bio;
-    document.getElementById('prof-disp-name').textContent = profileData.name || '—';
-    document.getElementById('prof-disp-user').textContent = '@' + (profileData.username || 'username');
-    renderDevBadgeIfNeeded();
+    document.querySelector('#profile .page-header h1').textContent = profileData.name || '—';
+    document.querySelector('#profile .page-header h3').textContent = '@' + (profileData.username || 'username');
 
+
+
+    if (!document.querySelector('.ava-wrap')) {
+        const avaContainer = document.createElement('div')
+        avaContainer.className = 'ava-wrap'
+        avaContainer.innerHTML = `
+            <div class="ava" id="prof-ava" onclick="onAvaTap()">
+                <canvas id="ava-upload-canvas" width="200" height="200" style="width:100%;height:100%;border-radius:50%;display:block;"></canvas>
+                <div class="ava-edit-badge" id="ava-edit-badge" style="display: flex;">📷</div>
+            </div>
+            <input type="file" id="ava-file-input" accept="image/*" style="display:none;">
+        `
+        document.querySelector('#profile .page-header').prepend(avaContainer)
+    }
+    if (!document.querySelector('profileHalfBg')) {
+        const halfbg = document.createElement('div')
+        halfbg.className = 'profileHalfBg'
+        document.querySelector('#profile .page-header').prepend(halfbg)
+    }
+    if (!document.querySelector('#badgeContainer')) {
+        const badgeContainer = document.createElement('div')
+        badgeContainer.id = 'badgeContainer'
+        badgeContainer.innerHTML = `
+            <div class="title-badge-display none-title" id="equipped-title-badge"
+                onclick="goAchievements(document.getElementById('nav-ach'))">
+                <span id="equipped-title-icon">🎖️</span>
+                <span id="equipped-title-text">Нет титула</span>
+            </div>
+        `
+        document.querySelector('#profile .page-header').appendChild(badgeContainer)
+    }
+    if (!document.querySelector('#profile .page-header #prof-banner-pattern')) {
+        const el = document.createElement('div')
+        el.id = 'prof-banner-pattern'
+        document.querySelector('#profile .page-header').prepend(el)
+    }
     // Main avatar is now photo-only (canvas), no SVG render here
     // Restore photo if no image loaded yet (placeholder shown by initAvaUpload)
     if (!_avaImg) {
         const canvas = document.getElementById('ava-upload-canvas');
         drawAvaPlaceholder(canvas);
     }
+    renderDevBadgeIfNeeded();
 
     // Banner
-    const banner = document.getElementById('prof-banner');
+    const banner = document.querySelector('#profile .page-header')
     const bc = BANNER_COLORS.find(c => c.id === profileData.bannerId) || BANNER_COLORS[0];
     banner.style.background = bc.g;
     const pat = BANNER_PATTERNS.find(p => p.id === profileData.patternId) || BANNER_PATTERNS[0];
@@ -2688,6 +2720,7 @@ function trySecretCode() {
     }
     input.value = '';
 }
+window.trySecretCode = trySecretCode
 
 // ─── EMPEROR AVATAR UPLOAD ────────────────────────────────────────────────────
 let _avaImg = null;
@@ -2696,6 +2729,7 @@ let _emperorMode = false;
 function onAvaTap() {
     document.getElementById('ava-file-input').click();
 }
+window.onAvaTap = onAvaTap
 
 function initAvaUpload() {
     _emperorMode = true;
@@ -2709,7 +2743,6 @@ function initAvaUpload() {
     drawAvaPlaceholder(canvas);
 
     const fileInput = document.getElementById('ava-file-input');
-    try {
     if (fileInput._bound) return;
     fileInput._bound = true;
     fileInput.addEventListener('change', function (e) {
@@ -2731,7 +2764,6 @@ function initAvaUpload() {
         };
         reader.readAsDataURL(file);
     });
-    } catch(e) {}
 }
 
 function drawAvaPlaceholder(canvas) {
@@ -2777,7 +2809,7 @@ function applyAvaUpload() {
 function pickBannerColor(id) {
     profileData.bannerId = id;
     const bc = BANNER_COLORS.find(c => c.id === id);
-    document.getElementById('prof-banner').style.background = bc.g;
+    document.querySelector('#profile .page-header').style.background = bc.g;
     renderProfileScreen();
 }
 
@@ -2788,6 +2820,8 @@ function pickBannerPattern(id) {
     patEl.className = pat.class;
     renderProfileScreen();
 }
+window.pickBannerPattern = pickBannerPattern
+window.pickBannerColor   = pickBannerColor
 
 function confirmReset() {
     document.getElementById('reset-modal-step1').style.display = 'block';
@@ -2832,7 +2866,7 @@ function saveProfile() {
     if (user === profileData.username) {
         // Username unchanged — just save name/bio
         profileData.name = name; profileData.bio = bio;
-        document.getElementById('prof-disp-name').textContent = name;
+        document.querySelector('#profile .page-header h1').textContent = name;
         saveState();
         showToast('✅ Профиль сохранён!', 1800);
         return;
@@ -2854,8 +2888,8 @@ function saveProfile() {
     }
     profileData.name = name; profileData.username = user; profileData.bio = bio;
     registerUsername(user, SAVE_KEY, null /* preserve existing hash */);
-    document.getElementById('prof-disp-name').textContent = name;
-    document.getElementById('prof-disp-user').textContent = '@' + user;
+    document.querySelector('#profile .page-header h1').textContent = name;
+    document.querySelector('#profile .page-header h3').textContent = '@' + user;
     if (isDevUsername(user)) applyDevAccount(user);
     renderDevBadgeIfNeeded();
     saveState();
@@ -3041,12 +3075,17 @@ function renderLeagueScreen() {
     const cur = getCurrentLeague();
     const curIdx = getLeagueIndex(cur.id);
     const next = LEAGUES[curIdx + 1] || null;
-    document.getElementById('league-banner').style.background = cur.bannerBg;
-    document.getElementById('league-trophy').innerHTML = cur.trophy;
-    document.getElementById('league-trophy').style.cssText = 'width:90px;height:90px;margin:0 auto 10px;filter:drop-shadow(0 4px 16px ' + cur.color + '88);';
-    document.getElementById('league-name-big').textContent = cur.name + ' лига';
-    document.getElementById('league-name-big').style.color = cur.color;
-    document.getElementById('league-xp-range').textContent = next
+
+    const leagueBanner  = document.querySelector('#league .page-header')
+    const leagueName    = document.querySelector('#league .page-header h1')
+    const leagueXP      = document.querySelector('#league .page-header h3')
+    const trophyImg     = document.querySelector('#league .page-header img')
+
+    leagueBanner.style.background = cur.bannerBg;
+    trophyImg.innerHTML = cur.trophy;
+    leagueName.textContent = cur.name + ' лига';
+    leagueName.style.color = cur.color;
+    leagueXP.textContent = next
         ? cur.minXP + ' – ' + (next.minXP - 1) + ' XP'
         : cur.minXP + '+ XP (максимальная!)';
     if (next) {
@@ -3137,7 +3176,7 @@ function showXPPopup(amount) {
     el.classList.add('show');
     setTimeout(() => el.classList.remove('show'), 1500);
     playXP();
-    } catch(e) {}
+    } catch(e) { console.warn(e) }
 }
 
 // ─── STREAK MODAL ─────────────────────────────────────────────────────────────
@@ -3160,7 +3199,6 @@ function closeStreakModal() {
 
 // ─── SPLASH SCREEN ────────────────────────────────────────────────────────────
 function runSplash(cb) {
-    try {
     const bar = document.getElementById('splash-bar');
     let p = 0;
     const iv = setInterval(() => {
@@ -3175,7 +3213,6 @@ function runSplash(cb) {
             }, 500);
         }, 200);
     }, 80);
-    } catch(e) {}
 }
 
 // ─── ONBOARDING ───────────────────────────────────────────────────────────────
@@ -3212,7 +3249,6 @@ function skipOnboard() {
 }
 
 function finishOnboard() {
-    localStorage.setItem('geltcode_onboarded', '1');
     window.changePage('registration')
     vibrateSuccess(); playLevelUp();
     // Show profile setup if user has no name yet
@@ -3226,6 +3262,7 @@ function finishOnboard() {
 }
 
 function finishProfileSetup() {
+    localStorage.setItem('geltcode_onboarded', '1');
     const name = document.getElementById('setup-name').value.trim();
     const user = document.getElementById('setup-username').value.trim();
     const bio = document.getElementById('setup-bio').value.trim();
@@ -3282,8 +3319,8 @@ function finishProfileSetup() {
         document.getElementById('edit-name').value = name;
         document.getElementById('edit-username').value = user;
         document.getElementById('edit-bio').value = bio;
-        document.getElementById('prof-disp-name').textContent = name;
-        document.getElementById('prof-disp-user').textContent = '@' + user;
+        document.querySelector('#profile .page-header h1').textContent = name;
+        document.querySelector('#profile .page-header h3').textContent = '@' + user;
         if (isDevUsername(user)) applyDevAccount(user);
         renderDevBadgeIfNeeded();
         saveState();
@@ -3305,9 +3342,9 @@ function finishProfileSetup() {
             document.getElementById('edit-name').value = name;
             document.getElementById('edit-username').value = user;
             document.getElementById('edit-bio').value = bio;
-            document.getElementById('prof-disp-name').textContent = name;
-            document.getElementById('prof-disp-user').textContent = '@' + user;
-        } catch(e) {}
+            document.querySelector('#profile .page-header h1').textContent = name;
+            document.querySelector('#profile .page-header h3').textContent = '@' + user;
+        } catch(e) { console.warn(e) }
         if (isDevUsername(user)) applyDevAccount(user);
         renderDevBadgeIfNeeded();
         saveState();
@@ -3430,7 +3467,7 @@ function renderLeaderboard() {
     const myEntry = { name: myName, username: profileData.username || 'me', xp, ava: null, isMe: true };
     const all = [...LB_BOTS, myEntry].sort((a, b) => b.xp - a.xp);
     const myRank = all.findIndex(e => e.isMe) + 1;
-    document.getElementById('lb-sub-label').textContent = `Твоё место: #${myRank} из ${all.length}`;
+    document.querySelector('#leaderboard .page-header h3').textContent = `Твоё место: #${myRank} из ${all.length}`;
 
     const medals = ['🥇', '🥈', '🥉'];
     document.getElementById('lb-list').innerHTML = all.map((e, i) => {
@@ -3498,14 +3535,34 @@ function flashWrong(el) {
 // Init on load
 loadState();
 
+await window.waitForVariable(() => window.eelibMgr?.isLoaded, true)
 renderModulesList();
 updateStats();
 charState.bg = 0;
-
-// Always init photo upload (for all users)
-setTimeout(() => initAvaUpload(), 200);
 
 // Splash → onboarding → app
 runSplash(() => {
     showOnboardingIfNeeded();
 });
+
+window.renderProfileScreen  = renderProfileScreen
+window.renderLeagueScreen   = renderLeagueScreen
+window.renderLeaderboard    = renderLeaderboard
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        initAvaUpload()
+    }, 200);
+})
+
+renderProfileScreen()
+renderLeagueScreen()
+renderLeaderboard()
+renderAchievements()
+
+const profileTabs = ['edit', 'look', 'devs']
+document.querySelectorAll('#profile .page-header-btns .btnsList button').forEach((btn, index) => {
+    btn.addEventListener('click', () => {
+        switchProfTab(profileTabs[index])
+    })
+})

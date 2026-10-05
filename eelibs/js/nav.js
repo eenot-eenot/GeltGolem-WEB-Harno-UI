@@ -51,9 +51,10 @@ class Nav {
         let head = document.createElement('header');
         head.className = 'page-header';
         const img = page.iconHead ? `<img src="${page.iconHead}">` : ''
+        const title = page.titleHead ? page.titleHead : page.title
         head.innerHTML = `
             ${img}
-            <h1>${page.title}</h1>
+            <h1>${title}</h1>
             <h3>${page.description ? page.description : ''}</h3>
         `;
 
@@ -407,8 +408,11 @@ class Nav {
                 if (newPageData.noNav === true) {
                     if (!navdown.classList.contains('hidden'))
                         navdown.classList.add('hidden')
-                } else 
+                    window.ThemesMgr.hideBlackDown(true)
+                } else {
                     navdown.classList.remove('hidden')
+                    window.ThemesMgr.hideBlackDown(false)
+                }
             }
 
             let isSubpage = isMobile? false : Array.isArray(basePageData?.subpages) ? basePageData.subpages.includes(newpage.id) : false;

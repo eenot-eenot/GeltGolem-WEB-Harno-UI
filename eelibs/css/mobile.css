@@ -54,6 +54,7 @@
 
     #navdown {
         display: inline-flex;
+        align-items: center;
     }
 
     .page.active {

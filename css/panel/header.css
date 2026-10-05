@@ -13,3 +13,11 @@
 
     padding: var(--dss) var(--ds);
 }
+
+#toast {
+    max-width: 90dvw;
+    width: 90dvw;
+    text-wrap-mode: wrap;
+    text-wrap-style: balance;
+    text-align: center;
+}

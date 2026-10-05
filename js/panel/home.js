@@ -18,3 +18,10 @@ function renderLang(lang) {
     document.querySelector('#home .page-header h1').textContent = lang[0].toUpperCase() + lang.slice(1)
     document.querySelector('#home .page-header h3').textContent = "0 из 5 модулей пройдено"
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('#home .page-header-btns .btnsList button').forEach(btn => {
+        if (btn.textContent === 'Pascal') btn.classList.add('active')
+    })
+    renderLang('pascal')
+})
